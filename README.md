@@ -1,8 +1,8 @@
 # VLM-HV : Vision-Language Model Based Handwriting Verification
 
-This repository provides ChatGPT implementation as descibed in the paper VLM-HV : Vision-Language Model Based Handwriting Verification
+This repository provides implemantation of the experiments descibed in the paper VLM-HV : Vision-Language Model Based Handwriting Verification
 
-Author : Mihir chauhan, Abhishek Satbhai
+Authors: _Mihir Chauhan, Abhishek Satbhai, Mohammad Abuzar Shaikh, Mir Basheer Ali, Bina Ramamurthy, Mingchen Gao, Siwei Lyu and Sargur Srihari_
 
 ### Sequence Diagram of the code flow 
 
