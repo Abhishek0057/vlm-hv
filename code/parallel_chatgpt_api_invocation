@@ -1,0 +1,170 @@
+import requests
+import base64
+from IPython.display import display, Markdown
+import pandas as pd
+import re
+import os
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+
+def load_image_as_base64(file_path):
+    file_path = f"./original_images/{file_path}"
+    with open(file_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
+
+    
+def get_test_dataframe(): 
+    
+    df = pd.read_parquet("1000_test_samples.parquet")
+    df = pd.concat([df.head(50), df.tail(50)])
+    #df = df[0:5]
+    #print(df)
+    
+    return df
+
+# Prepare the prompt
+def build_explanation_prompt(row):
+    encoded_image_one = load_image_as_base64(row['shuffled_sample1'])
+    encoded_image_two = load_image_as_base64(row['shuffled_sample2'])
+
+    prompt = f"""
+    You are a Forensic Document Examiner. You will be provided with two handwritten samples of the lowercase word "and". Your task is to provide a explanation if the two handwritten samples are written by the same writer or by different writers as follows:
+
+    - "Explanation" : 
+
+    Handwriting sample 1:
+    {encoded_image_one}
+
+    Handwriting sample 2:
+    {encoded_image_two}
+    """
+    return prompt
+
+def build_payload(messages, temperature=None):
+    payload = {
+        "model": "gpt-4o",  # Make sure to use the appropriate model
+        "messages" : messages
+    }
+    if temperature is not None:
+        payload = {
+            "model": "gpt-4o",  # Make sure to use the appropriate model
+            "messages" : messages, 
+            "temperature": temperature
+        }
+    return payload
+
+def build_decision_prompt():
+    prompt = f"""
+    Based on the explanation below, what is the decision Yes or No or Unknown? Handwriting written by same writer means Yes and different writer means No else its unknown.
+    """
+    return prompt
+
+def determine_decision(text):
+    # Define the patterns to match "Unknown", "Yes", and "No" (case-insensitive)
+    unknown_pattern = re.compile(r'\bUnknown\b', re.IGNORECASE)
+    yes_pattern = re.compile(r'\bYes\b', re.IGNORECASE)
+    no_pattern = re.compile(r'\bNo\b', re.IGNORECASE)
+    
+    # Search for "Unknown" in the text first
+    unknown_match = re.search(unknown_pattern, text)
+    if unknown_match:
+        return "Unknown"
+    
+    # Search for "Yes" and "No" in the text
+    yes_match = re.search(yes_pattern, text)
+    no_match = re.search(no_pattern, text)
+    
+    # Determine the decision based on the matches
+    if yes_match and not no_match:
+        return "Yes"
+    elif no_match and not yes_match:
+        return "No"
+    elif not yes_match and not no_match:
+        return "Unknown"
+    else:
+        return "Both"  # In case both "Yes" and "No" are found
+
+# Function to save row to Parquet file
+def save_row_to_parquet(row, index, directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    file_name = f"{index}_{row['shuffled_sample1']}_{row['shuffled_sample2']}.parquet"
+    file_path = os.path.join(directory, file_name)
+    df = pd.DataFrame([row])
+    df.to_parquet(file_path)
+    
+def post_process_decision(response_content2):
+    return determine_decision(response_content2)    
+
+def invoke_chatgpt_endpoint(payload, headers, timeout=300):
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    return session.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=timeout)
+
+
+def invoke_chatgpt(api_key, test_df, output_directory):
+    # Set your API key
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+        
+    for index, row in test_df.iterrows():
+        #For each row
+        messages = []
+        print("Processing index for explanation : ", index)
+        explanation_prompt = build_explanation_prompt(row)
+        messages = [
+            {"role": "system", "content": "You are a Forensic Document Examiner."},
+            {"role": "user", "content": explanation_prompt}
+        ]
+        explanation_payload = build_payload(messages, temperature=0)
+        explanation_response = invoke_chatgpt_endpoint(explanation_payload, headers)
+        
+        # Handle the response
+        if explanation_response.status_code == 200:
+            response_data = explanation_response.json()
+            #display(Markdown(f"**Response from ChatGPT:**\n\n{response_data['choices'][0]['message']['content']}"))
+                    # Extracting the decision and the explanation
+            response_content = response_data['choices'][0]['message']['content']
+            
+            test_df.at[index, 'explanation'] = response_content
+            row['explanation'] = response_content
+            
+            # Add the response to the conversation history
+            messages.append({"role": "assistant", "content": response_content})
+
+            # Follow-up question
+            decision_prompt = build_decision_prompt()
+            messages.append({"role": "user", "content": decision_prompt})
+        
+            decision_payload = build_payload(messages, temperature=None)
+            decision_response = invoke_chatgpt_endpoint(decision_payload, headers)
+            
+            if decision_response.status_code == 200:
+                time.sleep(2)
+                response_data2 = decision_response.json()
+                response_content2 = response_data2['choices'][0]['message']['content']
+                decision = post_process_decision(response_content2) 
+                if decision == "Unknown":
+                    continue
+                test_df.at[index, 'decision'] = decision
+                row['decision'] = decision
+                save_row_to_parquet(row, index, output_directory)
+
+        else:
+            display(Markdown(f"**Error:** {explanation_response.status_code}\n\n{explanation_response.text}"))
+        
+    return test_df
+
+def main():
+    for i in range(1):
+        api_key = '<api-key>'
+        output_directory = f'./output_parquet_files_2/final_100_{i+1}'
+        test_df = get_test_dataframe()
+        invoke_chatgpt(api_key, test_df, output_directory)
+        print(f"Completed running {i} times ")
