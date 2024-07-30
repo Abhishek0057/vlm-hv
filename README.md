@@ -13,7 +13,7 @@ Authors: _Mihir Chauhan, Abhishek Satbhai, Mohammad Abuzar Shaikh, Mir Basheer A
 ## SSL-HV Approach
 <img src="vlm-hv-methods.png" height="400">
 
-### Sequence Diagram of the code flow 
+## Sequence Diagram of the code flow 
 
 ```mermaid
 sequenceDiagram
