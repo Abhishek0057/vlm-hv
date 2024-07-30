@@ -4,6 +4,12 @@ This repository provides implemantation of the experiments descibed in the paper
 
 Authors: _Mihir Chauhan, Abhishek Satbhai, Mohammad Abuzar Shaikh, Mir Basheer Ali, Bina Ramamurthy, Mingchen Gao, Siwei Lyu and Sargur Srihari_
 
+## CEDAR Handwriting Dataset
+| Dataset | Link to Drive |
+|:-----------|:------------:|
+| CEDAR Letter Images | [Link](https://drive.google.com/drive/folders/1fwRlwtfzV_5Pnyxm9ahQLi2eum2rDshk?usp=sharing)  |
+| CEDAR AND Images| [Link](https://drive.google.com/drive/folders/1uj6eeaKBmabivxvRqrGokrcCb3B9yAHu?usp=sharing)  |
+
 ### Sequence Diagram of the code flow 
 
 ```mermaid
