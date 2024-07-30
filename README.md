@@ -10,6 +10,9 @@ Authors: _Mihir Chauhan, Abhishek Satbhai, Mohammad Abuzar Shaikh, Mir Basheer A
 | CEDAR Letter Images | [Link](https://drive.google.com/drive/folders/1fwRlwtfzV_5Pnyxm9ahQLi2eum2rDshk?usp=sharing)  |
 | CEDAR AND Images| [Link](https://drive.google.com/drive/folders/1uj6eeaKBmabivxvRqrGokrcCb3B9yAHu?usp=sharing)  |
 
+## SSL-HV Approach
+<img src="images/imvip.png" height="400">
+
 ### Sequence Diagram of the code flow 
 
 ```mermaid
