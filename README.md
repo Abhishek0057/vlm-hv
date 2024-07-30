@@ -48,4 +48,8 @@ sequenceDiagram
     Main ->> User: Process Complete
 ```
 
-### Cite 
+## Cite
+[VLM-HV paper]() (Accepted as short paper in [IMVIP](https://www.imvip.ie/) Proceedings Aug, 2024)
+```
+Upcoming
+```
