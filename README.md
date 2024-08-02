@@ -58,7 +58,7 @@ sequenceDiagram
 ```
 
 ## Cite
-[VLM-HV paper]() (Accepted as short paper in [IMVIP](https://www.imvip.ie/) Proceedings Aug, 2024)
+[VLM-HV paper](https://arxiv.org/abs/2407.21788) (Accepted as short paper in [IMVIP](https://www.imvip.ie/) Proceedings Aug, 2024)
 ```
 Upcoming@misc{chauhan2024visionlanguagemodelbasedhandwriting,
       title={Vision-Language Model Based Handwriting Verification}, 
