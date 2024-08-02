@@ -60,7 +60,7 @@ sequenceDiagram
 ## Cite
 [VLM-HV paper](https://arxiv.org/abs/2407.21788) (Accepted as short paper in [IMVIP](https://www.imvip.ie/) Proceedings Aug, 2024)
 ```
-Upcoming@misc{chauhan2024visionlanguagemodelbasedhandwriting,
+@misc{chauhan2024visionlanguagemodelbasedhandwriting,
       title={Vision-Language Model Based Handwriting Verification}, 
       author={Mihir Chauhan and Abhishek Satbhai and Mohammad Abuzar Hashemi and Mir Basheer Ali and Bina Ramamurthy and Mingchen Gao and Siwei Lyu and Sargur Srihari},
       year={2024},
@@ -68,4 +68,5 @@ Upcoming@misc{chauhan2024visionlanguagemodelbasedhandwriting,
       archivePrefix={arXiv},
       primaryClass={cs.CV},
       url={https://arxiv.org/abs/2407.21788}, 
-}```
+}
+```
